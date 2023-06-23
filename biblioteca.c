@@ -27,7 +27,7 @@ struct lentBook{
 };
 
 int menu();
-void insertStudent(struct student elements[], int size);
+void insertStudent(struct student element[], int size);
 void insertBook(struct book element[], int size);
 void prints(struct lentBook element);
 
