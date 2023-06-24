@@ -3,52 +3,45 @@
 */
 #include <stdio.h>
 #include <ctype.h>
-#define MAXSIZE 10
+#include <stdlib.h>
+#define MAXINPUT 10
 
 struct car {
     int plate;
-    float vel;
+    float velocity;
 };
 
 int menu();
-void insert(struct car elements[], int size);
+void insertCarData(struct car elements[], int size);
+void printOverLimit(struct car elements[], int size);
+void printOverTwentyPercentLimit(struct car elements[], int size);
+void printUpToTwentyPercentLimit(struct car elements[], int size);
+void printOverTwentyPercentLimit(struct car elements[], int size);
 void prints(struct car element);
 
 int main(){
 
-    struct car dataset[MAXSIZE];
+    struct car carData[MAXINPUT];
 
-    int selected, size;
+    int selected, sizeCarData;
 
 
-    size = 0;
+    sizeCarData = 0;
     do{
         selected = menu();
         switch (selected){
         case 1:
-            insert(dataset, size);
-            size += 1;
+            insertCarData(carData, sizeCarData);
+            sizeCarData++;
             break;
         case 2:
-            for(int index = 0; index != size; index++){
-                if(dataset[index].vel > 80.0){
-                    prints(dataset[index]);
-                }
-            }
+            printOverLimit(carData, sizeCarData);
             break;
         case 3:
-            for(int index = 0; index != size; index++){
-                if((dataset[index].vel > 80.0) && (dataset[index].vel <= 96.0)){
-                    prints(dataset[index]);
-                }
-            }
+            printUpToTwentyPercentLimit(carData, sizeCarData);
             break;
         case 4:
-            for(int index = 0; index != size; index++){
-                if(dataset[index].vel > 96.0){
-                    prints(dataset[index]);
-                }
-            }
+            printOverTwentyPercentLimit(carData, sizeCarData);
             break;
         default:
             printf("Êxito em Sair.\n\n");
@@ -59,30 +52,72 @@ int main(){
     
     return 0;
 }
-void insert(struct car elements[], int size){
+void insertCarData(struct car elements[], int size){
+    printf("---- DADOS DO CARRO ----\n");
     printf("Placa: ");
     scanf("%d", &elements[size].plate);
-    fflush(stdin);
+    getchar();
+
     printf("Velocidade aferida: ");
-    scanf("%f", &elements[size].vel);
-    fflush(stdin);
-    elements[size].vel *= 0.93;
+    scanf("%f", &elements[size].velocity);
+    getchar();
+    elements[size].velocity *= 0.93;
 }
 void prints(struct car element){
-    printf("> Placa: %4d \t Velocidade: %.1f ", element.plate, element.vel);
+    printf("\n> Placa: %d \t Velocidade: %.1f \n", element.plate, element.velocity);
+}
+void printOverLimit(struct car elements[], int size){
+    int findOverLimit = 0;
+    printf("---- CARROS ACIMA DO LIMITE ----\n");
+    for(int index = 0; index != size; index++){
+        if(elements[index].velocity > 80.0){
+            prints(elements[index]);
+            findOverLimit = 1;
+        }
+    }
+    if(findOverLimit == 0){
+        printf("\n> Não há carros acima do limite.");
+    }
+}
+void printUpToTwentyPercentLimit(struct car elements[], int size){
+    int findOverLimit = 0;
+    printf("---- CARROS ATÉ 20%% ACIMA DO LIMITE ----\n");
+    for(int index = 0; index != size; index++){
+        if((elements[index].velocity > 80.0) && (elements[index].velocity <= 96.0)){
+            prints(elements[index]);
+            findOverLimit = 1;
+        }
+    }
+    if(findOverLimit == 0){
+        printf("\n> Não há carros acima do limite.");
+    }
+}
+void printOverTwentyPercentLimit(struct car elements[], int size){
+    int findOverLimit = 0;
+    printf("---- CARROS ACIMA DE 20%% DO LIMITE ----\n");
+    for(int index = 0; index != size; index++){
+        if(elements[index].velocity > 96.0){
+            prints(elements[index]);
+            findOverLimit = 1;
+        }
+    }
+    if(findOverLimit == 0){
+        printf("\n> Não há carros acima do limite.");
+    }
 }
 int menu(){
     int option;
     do{
-        printf("\n\n---- SELECIONE UMA OPÇÃO ----\n");
+        printf("\n---- SELECIONE UMA OPÇÃO ----\n");
         printf("(1) - Inserir dados do carro\n");
-        printf("(2) - Mostrar veículos com excesso de velocidade\n");
-        printf("(3) - Mostrar veículos com até 20%% acima do limite\n");
-        printf("(4) - Mostrar veículos acima de 20%% do limite\n");
+        printf("(2) - Buscar veículos com excesso de velocidade\n");
+        printf("(3) - Buscar veículos com até 20%% acima do limite\n");
+        printf("(4) - Buscar veículos acima de 20%% do limite\n");
         printf("(0) - Sair\n");
         printf("\nOpção desejada: ");
         scanf("%d", &option);
-        fflush(stdin);
+        getchar();
+        system("cls");
     }while(option < 0 || option > 4);
     return option;
 }
