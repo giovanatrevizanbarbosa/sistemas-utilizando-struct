@@ -14,7 +14,6 @@ struct car {
 int menu();
 void insertCarData(struct car elements[], int size);
 void printOverLimit(struct car elements[], int size);
-void printOverTwentyPercentLimit(struct car elements[], int size);
 void printUpToTwentyPercentLimit(struct car elements[], int size);
 void printOverTwentyPercentLimit(struct car elements[], int size);
 void prints(struct car element);
