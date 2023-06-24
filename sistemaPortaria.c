@@ -5,62 +5,60 @@ Busca pelo prontuário do aluno.
 */
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define MAXSIZE 10
-#define MAXCARC 50
+#define MAXINPUT 10
+#define MAXCHARACTER 50
 
 struct car {
-    char brand[MAXCARC];
-    char model[MAXCARC];
-    char color[MAXCARC];
-    char pront[10];
-    char name[MAXCARC];
+    char brand[MAXCHARACTER];
+    char model[MAXCHARACTER];
+    char color[MAXCHARACTER];
+    char prontuary[MAXINPUT];
+    char studentName[MAXCHARACTER];
     int plate;
 };
 
 int menu();
-void insert(struct car element[], int size);
+void insertCarStudentData(struct car element[], int sizeCarData);
+void searchByCarPlate(struct car elements[], int filter, int size);
+void searchByProntuary(struct car elements[], char filter[MAXINPUT], int size);
 void prints(struct car element);
 
 int main(){
 
-    struct car dataset[MAXSIZE];
+    struct car carData[MAXINPUT];
 
-    int selected, size;
+    int selected, sizeCarData;
     int filterPlate;
-    char filterPront[10];
+    char filterProntuary[MAXINPUT];
 
-    size = 0;
+    sizeCarData = 0;
     do{
         selected = menu();
         switch (selected){
         case 1:
-            insert(dataset, size);
-            size++;
+            insertCarStudentData(carData, sizeCarData);
+            sizeCarData++;
 
             break;
         case 2:
-            printf("Placa a buscar: ");
+            printf("---- BUSCA ----\n");
+            printf("\nPlaca a buscar: ");
             scanf("%d", &filterPlate);
 
-            for(int index = 0; index != size; index++){
-                if(dataset[index].plate == filterPlate){
-                    prints(dataset[index]);
-                }
-            }
+            searchByCarPlate(carData, filterPlate, sizeCarData);
 
             break;
         case 3:
-            printf("Prontuário a buscar: ");
-            fgets(filterPront, 10, stdin);
-            filterPront[strcspn(filterPront, "\n")] = '\0';
+            printf("---- BUSCA ----\n");
+            printf("\nProntuário a buscar: ");
+            fgets(filterProntuary, MAXINPUT, stdin);
+            filterProntuary[strcspn(filterProntuary, "\n")] = '\0';
             
-            for(int index = 0; index != size; index++){
-                if(strcasecmp(filterPront, dataset[index].pront) == 0){
-                    prints(dataset[index]);
-                }
-            }
+            searchByProntuary(carData, filterProntuary, sizeCarData);
+
             break;
         default:
             printf("Êxito em Sair.\n\n");
@@ -71,42 +69,59 @@ int main(){
     
     return 0;
 }
-void insert(struct car element[], int size){
+void insertCarStudentData(struct car element[], int sizeCarData){
+    printf("---- DADOS DO CARRO E ALUNO ----\n");
     printf("Placa: ");
-    scanf("%d", &element[size].plate);
+    scanf("%d", &element[sizeCarData].plate);
     getchar();
 
     printf("Marca: ");
-    scanf("%s", element[size].brand);
-    element[size].brand[strcspn(element[size].brand, "\n")] = '\0';
-    strcpy(element[size].brand, strupr(element[size].brand));
+    scanf("%s", element[sizeCarData].brand);
+    element[sizeCarData].brand[strcspn(element[sizeCarData].brand, "\n")] = '\0';
+    strcpy(element[sizeCarData].brand, strupr(element[sizeCarData].brand));
     getchar();
 
     printf("Modelo: ");
-    scanf("%s", element[size].model);
-    strcpy(element[size].model, strupr(element[size].model));
+    scanf("%s", element[sizeCarData].model);
+    strcpy(element[sizeCarData].model, strupr(element[sizeCarData].model));
     getchar();
 
     printf("Cor: ");
-    scanf("%s", element[size].color);
-    element[size].color[strcspn(element[size].color, "\n")] = '\0';
-    strcpy(element[size].color, strupr(element[size].color));
+    scanf("%s", element[sizeCarData].color);
+    element[sizeCarData].color[strcspn(element[sizeCarData].color, "\n")] = '\0';
+    strcpy(element[sizeCarData].color, strupr(element[sizeCarData].color));
     getchar();
 
     printf("Nome do aluno: ");
-    scanf("%s", element[size].name);
-    element[size].name[strcspn(element[size].name, "\n")] = '\0';
-    strcpy(element[size].name, strupr(element[size].name));
+    scanf("%s", element[sizeCarData].studentName);
+    element[sizeCarData].studentName[strcspn(element[sizeCarData].studentName, "\n")] = '\0';
+    strcpy(element[sizeCarData].studentName, strupr(element[sizeCarData].studentName));
     getchar();
 
     printf("Prontuário do aluno: ");
-    scanf("%s", element[size].pront);
-    element[size].pront[strcspn(element[size].pront, "\n")] = '\0';
-    strcpy(element[size].pront, strupr(element[size].pront));
+    scanf("%s", element[sizeCarData].prontuary);
+    element[sizeCarData].prontuary[strcspn(element[sizeCarData].prontuary, "\n")] = '\0';
+    strcpy(element[sizeCarData].prontuary, strupr(element[sizeCarData].prontuary));
     getchar();
 }
 void prints(struct car element){
-    printf("\n> Marca: %s \t Modelo: %s \tCor: %s \t Nome: %s\n\n", element.brand, element.model, element.color, element.name);
+    printf("\n> Marca: %s \t Modelo: %s \tCor: %s \t Nome: %s\n", element.brand, element.model, element.color, element.studentName);
+}
+void searchByCarPlate(struct car elements[], int filter, int size){
+    printf("\n---- CARRO REFERENTE A PLACA: %d ----\n", filter);
+    for(int index = 0; index != size; index++){
+        if(elements[index].plate == filter){
+            prints(elements[index]);
+        }
+    }
+}
+void searchByProntuary(struct car elements[], char filter[MAXINPUT], int size){
+    printf("---- CARRO REFERENTE AO PRONTUARIO: %s----\n", filter);
+    for(int index = 0; index != size; index++){
+        if(strcasecmp(filter, elements[index].prontuary) == 0){
+            prints(elements[index]);
+        }
+    }
 }
 int menu(){
     int option;
@@ -118,7 +133,8 @@ int menu(){
         printf("(0) - Sair\n");
         printf("\nOpção desejada: ");
         scanf("%d", &option);
-        fflush(stdin);
+        getchar();
+        system("cls");
     }while(option < 0 || option > 3);
     return option;
 }
