@@ -7,108 +7,60 @@ Livro(ISBN, titulo)
 
 Devemos implementar um sistema que permita o cadastro eletrônico dos alunos e dos livros da instituição. O sistema deve permitir o empréstimo de livros da biblioteca aos alunos e deve armazenar os dados de qual livro está com qual aluno. O sistema deve imprimir uma lista com os livros emprestados para cada um dos alunos.
 */
-
 #include <stdio.h>
 #include <string.h>
-#define MAX 15
+#include <stdlib.h>
+#define MAXINPUT 15
 
 struct student{
-    char pront[10];
-    char name[30];
+    char prontuary[10];
+    char studentName[30];
 };
 struct book{
     int isbn; // 13 digitos
-    char title[100];
+    char bookTitle[100];
 };
 struct lentBook{
-    char pront[10];
-    char title[100];
-    char name[30];
+    char prontuary[10];
+    char bookTitle[100];
+    char studentName[30];
 };
 
 int menu();
-void insertStudent(struct student element[], int size);
+void insertStudent(struct student elements[], int size);
 void insertBook(struct book element[], int size);
-void prints(struct lentBook element);
-
+int lendBook(struct student element1[], struct book element2[], struct lentBook element3[], int sizeLentBookData, int sizeBookData, int sizeStudentData);
+void printLentBookList(struct lentBook element[], int sizeLentBookData);
 
 int main(){
-    struct student dataSt[MAX];
-    struct book dataBk[MAX];
-    struct lentBook dataLent[MAX];
+    struct student studentData[MAXINPUT];
+    struct book bookData[MAXINPUT];
+    struct lentBook lentBookData[MAXINPUT];
 
-    int selected, sizeOfStd = 0, sizeOfBook = 0, sizeOfLent = 0;
-    int selectBook;
-    char studentSrch[10];
+    int selected, sizeStudentData = 0, sizeBookData = 0, sizeLentBookData = 0;
 
     do{
         selected = menu();
         switch (selected){
         case 1:
-            printf("\n---- DADOS DO ALUNO ----\n\n");
-            insertStudent(dataSt, sizeOfStd);
-            sizeOfStd++;
+            printf("\n---- DADOS DO ALUNO ----\n");
+            insertStudent(studentData, sizeStudentData);
+            sizeStudentData++;
 
             break;
         case 2:
-            printf("\n---- DADOS DO LIVRO ----\n\n");
-            insertBook(dataBk, sizeOfBook);
-            sizeOfBook++;
+            printf("\n---- DADOS DO LIVRO ----\n");
+            insertBook(bookData, sizeBookData);
+            sizeBookData++;
 
             break;
         case 3:
-            if(sizeOfBook != 0){
-                printf("\n----LIVROS CADASTRADOS--------\n\n");
-                for(int i = 0; i < sizeOfBook; i++){
-                    printf("> (%d) %s\n", i+1, dataBk[i].title);
-                }
+            sizeLentBookData = lendBook(studentData, bookData, lentBookData, sizeLentBookData, sizeBookData, sizeStudentData);
 
-                printf("\nOpção desejada: ");
-                scanf("%d", &selectBook);
-                getchar();
-
-                int i = 0, foundBk = 0;
-                while((i < sizeOfBook) && (foundBk == 0)){
-                    if(i+1 == selectBook){
-                        strcpy(dataLent[sizeOfLent].title, dataBk[i].title);
-                        foundBk = 1;
-                    }
-                    i++;
-                }
-
-                if(foundBk != 0){
-                    printf("Prontuário: ");
-                    fgets(studentSrch, 10, stdin);
-                    getchar();
-
-                    int j = 0, foundStd = 0;
-                    while((j < sizeOfStd) && (foundStd == 0)){
-                        if(strcasecmp(dataSt[j].pront, studentSrch) == 0){
-                            strcpy(dataLent[sizeOfLent].pront, dataSt[j].pront);
-                            strcpy(dataLent[sizeOfLent].name, dataSt[j].name);
-                            foundStd = 1;
-                            printf("Livro emprestado com sucesso.\n");
-                        }
-                        j++;
-                    }
-                    sizeOfLent++;
-                }else{
-                    printf("\nOpção inválida.\n");
-                }
-            }else{
-                printf("\n----NENHUM LIVRO CADASTRADO-----\n");
-            }
             break;
         case 4:
-            if(sizeOfLent != 0){
-                printf("\n----LIVROS EMPRESTADOS-----------\n");
-                for(int i = 0; i < sizeOfLent; i++){
-                    prints(dataLent[i]);
-                }
-            }else{
-                printf("\n----NENHUM LIVRO EMPRESTADO-----\n");
-            }
-
+            printf("\n----LIVROS EMPRESTADOS-----------\n");
+            printLentBookList(lentBookData, sizeLentBookData);
             break;
         default:
             printf("Êxito em Sair.\n\n");
@@ -121,15 +73,15 @@ int main(){
 }
 void insertStudent(struct student element[], int size){
     printf("Prontuário: ");
-    fgets(element[size].pront, 10, stdin);
-    element[size].pront[strcspn(element[size].pront, "\n")] = '\0';
-    strcpy(element[size].pront, strupr(element[size].pront));
+    fgets(element[size].prontuary, 10, stdin);
+    element[size].prontuary[strcspn(element[size].prontuary, "\n")] = '\0';
+    strcpy(element[size].prontuary, strupr(element[size].prontuary));
     getchar();
 
     printf("Nome: ");
-    fgets(element[size].name, 30, stdin);
-    element[size].name[strcspn(element[size].name, "\n")] = '\0';
-    strcpy(element[size].name, strupr(element[size].name));
+    fgets(element[size].studentName, 30, stdin);
+    element[size].studentName[strcspn(element[size].studentName, "\n")] = '\0';
+    strcpy(element[size].studentName, strupr(element[size].studentName));
 }
 void insertBook(struct book element[], int size){
     printf("ISBN: ");
@@ -137,12 +89,51 @@ void insertBook(struct book element[], int size){
     getchar();
 
     printf("Título: ");
-    fgets(element[size].title, 100, stdin);
-    element[size].title[strcspn(element[size].title, "\n")] = '\0';
-    strcpy(element[size].title, strupr(element[size].title));
+    fgets(element[size].bookTitle, 100, stdin);
+    element[size].bookTitle[strcspn(element[size].bookTitle, "\n")] = '\0';
+    strcpy(element[size].bookTitle, strupr(element[size].bookTitle));
 }
-void prints(struct lentBook element){
-    printf("\n> Título:  %s \t\t Aluno(a):  %s\n", element.title, element.name);
+int lendBook(struct student element1[], struct book element2[], struct lentBook element3[], int sizeLentBookData, int sizeBookData, int sizeStudentData){
+    int selectBook;
+    char studentSrch[10];
+    if(sizeBookData != 0){
+        printf("\n----LIVROS CADASTRADOS--------\n\n");
+        for(int i = 0; i < sizeBookData; i++){
+            printf("> (%d) %s\n", i+1, element2[i].bookTitle);
+        }
+
+        printf("\nOpção desejada: ");
+        scanf("%d", &selectBook);
+        getchar();
+
+        for(int i = 0; i < sizeBookData; i++){
+            if(i+1 == selectBook){
+                strcpy(element3[sizeLentBookData].bookTitle, element2[i].bookTitle);
+            }
+        }
+        
+        printf("Prontuário: ");
+        fgets(studentSrch, 10, stdin);
+
+        for(int j = 0; j < sizeStudentData; j++){
+            if(strcasecmp(element1[j].prontuary, studentSrch) == 0){
+                strcpy(element3[sizeLentBookData].prontuary, element1[j].prontuary);
+                strcpy(element3[sizeLentBookData].studentName, element1[j].studentName);
+                printf("Livro emprestado com sucesso.\n");
+            }
+        }
+
+        sizeLentBookData++;
+    }else{
+        printf("\n----NENHUM LIVRO CADASTRADO-----\n");
+    }
+
+    return sizeLentBookData;
+}
+void printLentBookList(struct lentBook element[], int sizeLentBookData){
+    for(int i = 0; i < sizeLentBookData;  i++){
+        printf("\n> Título:  %s \t\t Aluno(a):  %s\n", element[i].bookTitle, element[i].studentName);    
+    }
 }
 int menu(){
     int option;
@@ -156,6 +147,7 @@ int menu(){
         printf("\nOpção desejada: ");
         scanf("%d", &option);
         getchar();
+        system("cls");
     }while(option < 0 || option > 4);
     return option;
 }
