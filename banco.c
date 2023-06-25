@@ -7,95 +7,62 @@ MOVIMENTACAO(id, nro_conta, tipo[credito/debito], valor)
 
 O sistema deve apresentar ao cliente seu extrato e atualizar o saldo do cliente sempre que houver alguma movimentação.
 */
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#define MAX 10
+#include <stdlib.h>
+#define MAXINPUT 10
 
 struct client{
-    int nroConta;
+    int accountNumber;
     int cpf;
-    char name[50];
-    double balance;
+    char clientName[50];
+    double clientBalance;
 };
-
 struct bankMove{
-    int nroConta;
-    int id;
-    char type[8];
-    double value;
+    int accountNumber;
+    int moveId;
+    char moveType[8];
+    double moveValue;
 };
 
 int menu();
 void insertClient(struct client element[], int size);
-void insertMove(struct bankMove element[], int size);
-void prints(struct bankMove element);
+void insertBankMove(struct bankMove element[], int size);
+void updateBalance(struct client elementClient[], struct bankMove elementBankMove[], int sizeClientData, int sizeBankMoveData);
+void printExtract(struct client element[], int filter,int size);
+void printBankMove(struct bankMove elements[], struct bankMove element[], int filter, int size);
+
 
 int main(){
 
-    struct client dataClient[MAX];
-    struct bankMove dataMove[MAX];
+    struct client dataClient[MAXINPUT];
+    struct bankMove dataMove[MAXINPUT];
 
-    int selected, sizeOfClient = 0, sizeOfMove = 0;
-    int filterNro;
+    int selected, sizeClientData = 0, sizeBankMoveData = 0;
+    int filterAccountNumber;
 
     do{
         selected = menu();
         switch (selected){
         case 1:
-            insertClient(dataClient, sizeOfClient);
-            sizeOfClient++;
+            insertClient(dataClient, sizeClientData);
+            sizeClientData++;
 
             break;
         case 2:
-            insertMove(dataMove, sizeOfMove);
-
-            int index = 0, findClient = 0;
-            while((index < sizeOfClient) && (findClient != 1)){
-                if(dataMove[sizeOfMove].nroConta == dataClient[index].nroConta){
-                    if(strcasecmp(dataMove[sizeOfMove].type, "credito") == 0){      
-                        dataClient[index].balance += dataMove[sizeOfMove].value;
-                    }else{
-                        if(strcasecmp(dataMove[sizeOfMove].type, "debito") == 0){
-                            dataClient[index].balance -= dataMove[sizeOfMove].value;
-                        }else{
-                            printf("Tipo digitado inválido.");
-                        }
-                    }
-                    findClient = 1;
-                    printf("\n>> Saldo: R$ %.2lf\n", dataClient[index].balance);
-                }
-                index++;
-            }
-
-            sizeOfMove++;
+            insertBankMove(dataMove, sizeBankMoveData);
+            updateBalance(dataClient, dataMove, sizeClientData, sizeBankMoveData);
+            sizeBankMoveData++;
 
             break;
         case 3:
+            printf("---- VER EXTRATO ----\n");
             printf("Insira o número da conta: ");
-            scanf("%d", &filterNro);
+            scanf("%d", &filterAccountNumber);
 
-            int i = 0;
-            findClient = 0;
-            while((i < sizeOfClient) && (findClient != 1)){
-                if(dataClient[i].nroConta == filterNro){
-                    printf("\n--- EXTRATO ------------\n");
-                    printf("\n*CONTA* \t\t *NOME*");
-                    printf("\n %d  \t\t\t  %s  ", dataClient[i].nroConta, dataClient[i].name);
-                    if(sizeOfMove != 0){
-                        printf("\n--- MOVIMENTAÇÕES------------\n");
-                        for (int j = 0; j < sizeOfMove; j++) {
-                            if (dataMove[j].nroConta == filterNro) {
-                                prints(dataMove[j]);
-                            }
-                        }
-                    }
-                    findClient = 1;
-                    printf("\n\n>> Saldo: \t\t R$ %.2lf\n", dataClient[i].balance);
-                }
-                i++;
-            }
+            printExtract(dataClient, filterAccountNumber, sizeClientData);
+            printBankMove(dataMove, dataMove, filterAccountNumber, sizeBankMoveData);
 
             break;
         default:
@@ -108,8 +75,9 @@ int main(){
     return 0;
 }
 void insertClient(struct client element[], int size){
+    printf("---- DADOS DO CLIENTE ----\n");
     printf("Número da conta: ");
-    scanf("%d", &element[size].nroConta);
+    scanf("%d", &element[size].accountNumber);
     getchar();
 
     printf("CPF: ");
@@ -117,33 +85,75 @@ void insertClient(struct client element[], int size){
     getchar();
 
     printf("Nome: ");
-    fgets(element[size].name, 50, stdin);
-    strcpy(element[size].name, strupr(element[size].name));
+    fgets(element[size].clientName, 50, stdin);
+    strcpy(element[size].clientName, strupr(element[size].clientName));
 
     printf("Saldo: ");
-    scanf("%lf", &element[size].balance);
+    scanf("%lf", &element[size].clientBalance);
     getchar();
 }
-void insertMove(struct bankMove element[], int size){
+void insertBankMove(struct bankMove element[], int size){
+    printf("---- DADOS DA MOVIMENTAÇÃO ----\n");
     printf("Número da conta: ");
-    scanf("%d", &element[size].nroConta);
+    scanf("%d", &element[size].accountNumber);
     getchar();
 
     printf("ID da movimentaçao: ");
-    scanf("%d", &element[size].id);
+    scanf("%d", &element[size].moveId);
     getchar();
 
     printf("Credito ou debito: ");
-    fgets(element[size].type, 8, stdin);
-    element[size].type[strcspn(element[size].type, "\n")] = '\0';
-    strcpy(element[size].type, strupr(element[size].type));
+    fgets(element[size].moveType, 8, stdin);
+    element[size].moveType[strcspn(element[size].moveType, "\n")] = '\0';
+    strcpy(element[size].moveType, strupr(element[size].moveType));
 
     printf("Valor: ");
-    scanf("%lf", &element[size].value);
+    scanf("%lf", &element[size].moveValue);
     getchar();
 }
-void prints(struct bankMove element){
-    printf("\n> Tipo:  %s \t Valor: %.2lf \t\t ID: %d", element.type, element.value, element.id);
+void updateBalance(struct client elementClient[], struct bankMove elementBankMove[], int sizeClientData, int sizeBankMoveData){
+    int index = 0;
+    int findClient = 0;
+    while((index < sizeClientData) && (findClient != 1)){
+        if(elementBankMove[sizeBankMoveData].accountNumber == elementClient[index].accountNumber){
+            if(strcasecmp(elementBankMove[sizeBankMoveData].moveType, "credito") == 0){      
+                elementClient[index].clientBalance += elementBankMove[sizeBankMoveData].moveValue;
+            }else{
+                if(strcasecmp(elementBankMove[sizeBankMoveData].moveType, "debito") == 0){
+                    elementClient[index].clientBalance -= elementBankMove[sizeBankMoveData].moveValue;
+                }else{
+                    printf("Tipo digitado inválido.");
+                }
+            }
+            findClient = 1;
+            printf("\n>> Saldo: R$ %.2lf\n", elementClient[index].clientBalance);
+        }
+        index++;
+    }
+}
+void printExtract(struct client element[], int filter, int size){
+    int index = 0;
+    int findClient = 0;
+    while((index < size) && (findClient != 1)){
+        if(element[index].accountNumber == filter){
+            printf("\n---- EXTRATO ----\n");
+            printf("\n*CONTA* \t\t *NOME*");
+            printf("\n %d  \t\t\t  %s  ", element[index].accountNumber, element[index].clientName);
+            findClient = 1;
+            printf("\n\n>> Saldo: \t\t R$ %.2lf\n", element[index].clientBalance);
+        }
+        index++;
+    }
+}
+void printBankMove(struct bankMove elements[], struct bankMove element[], int filter, int size){
+    if(size != 0){
+        printf("\n---- MOVIMENTAÇÕES----\n");
+        for (int j = 0; j < size; j++) {
+            if (elements[j].accountNumber == filter) {
+                printf("\n> Tipo:  %s \t Valor: %.2lf \t\t ID: %d\n", element[j].moveType, element[j].moveValue, element[j].moveId);
+            }
+        }
+    }
 }
 int menu(){
     int option;
@@ -156,6 +166,7 @@ int menu(){
         printf("\nOpção desejada: ");
         scanf("%d", &option);
         getchar();
+        system("cls");
     }while(option < 0 || option > 3);
     return option;
 }
